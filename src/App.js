@@ -1,26 +1,39 @@
-import logo from "./logo.svg";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import authService from "./services/auth.service";
+import Header from "./components/Header";
 
-function App() {
+const App = () => {
+  const [showModeratorBoard, setShowModeratorBoard] = useState(false);
+  const [showAdminBoard, setShowAdminBoard] = useState(false);
+  const [currentUser, setCurrentUser] = useState(undefined);
+
+  useEffect(() => {
+    const user = authService.getCurrentUser();
+
+    if (user) {
+      setCurrentUser(user);
+      setShowModeratorBoard(user.roles.includes(`ROLE_MODERATOR`)); // returns boolean
+      setShowAdminBoard(user.roles.includes(`ROLE_ADMIN`));
+    }
+  }, []);
+
+  const logOut = () => {
+    authService.logout();
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header
+        currentUser={currentUser}
+        showModeratorBoard={showModeratorBoard}
+        showAdminBoard={showAdminBoard}
+        logout={logOut}
+      />
     </div>
   );
-}
+};
 
 export default App;
